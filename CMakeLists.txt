@@ -1,42 +1,261 @@
-cmake_minimum_required(VERSION 3.16)
+#
+# Cockpit Assistant 
+#
+# Copyright (C) 2020-2025 Max Levi 
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later OR Commercial
+#
+cmake_minimum_required(VERSION 3.20)
 
-project(cockpit-assistant VERSION 0.1 LANGUAGES CXX)
 
+#-------------------------------------------------------------------------------
+# Define project name & find Qt packages for correct CPack calls
+#-------------------------------------------------------------------------------
+project(Cockpit-Assistant VERSION 0.1 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
-
-qt_standard_project_setup(REQUIRES 6.5)
-
-qt_add_executable(appcockpit-assistant
-    main.cpp
+find_package(
+    Qt6 REQUIRED 
+    COMPONENTS 
+    Core
+    Qml
 )
 
-qt_add_qml_module(appcockpit-assistant
-    URI cockpit-assistant
-    VERSION 1.0
-    QML_FILES
-        Main.qml
-)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-set_target_properties(appcockpit-assistant PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appcockpit-assistant
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
+#-------------------------------------------------------------------------------
+# Options for build types
+#-------------------------------------------------------------------------------
+option(DEBUG_SANITIZER "Enable sanitizers for debug builds" OFF)
+option(PRODUCTION_OPTIMIZATION "Enable production optimization flags" OFF)
 
-target_link_libraries(appcockpit-assistant
-    PRIVATE Qt6::Quick
-)
 
-include(GNUInstallDirs)
-install(TARGETS appcockpit-assistant
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+#-------------------------------------------------------------------------------
+# Project information
+#-------------------------------------------------------------------------------
+set(PROJECT_DISPNAME            "Cockpit Assistant")
+set(PROJECT_EXECUTABLE          "Cockpit-Assistant")
+set(PROJECT_VENDOR              "Max Levi")
+set(PROJECT_CONTACT             "https://github.com/Ma-x-levi/cockpit-assistant")
+set(PROJECT_DESCRIPTION_SUMMARY "Flexible data visualization software for embedded devices and projects")
+set(PROJECT_VERSION_MAJOR       "3")
+set(PROJECT_VERSION_MINOR       "0")
+set(PROJECT_VERSION_PATCH       "6")
+set(PROJECT_VERSION             "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(PROJECT_APPCAST             "https://github.com/Ma-x-levi/cockpit-assistant")
+
+set(PROJECT_ROOT_DIR            ${CMAKE_CURRENT_LIST_DIR})
+set(PROJECT_DESCRIPTION_FILE    "${PROJECT_ROOT_DIR}/README.md")
+set(PROJECT_FILE_NAME           "${PROJECT_EXECUTABLE}-v${PROJECT_VERSION}")
+set(PROJECT_FILE_LICENSE        "${PROJECT_ROOT_DIR}/LICENSE.md")
+
+
+#-------------------------------------------------------------------------------
+# Allow source code to access project information
+#-------------------------------------------------------------------------------
+add_definitions(-DPROJECT_VENDOR="${PROJECT_VENDOR}")
+add_definitions(-DPROJECT_CONTACT="${PROJECT_CONTACT}")
+add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
+add_definitions(-DPROJECT_APPCAST="${PROJECT_APPCAST}")
+add_definitions(-DPROJECT_DISPNAME="${PROJECT_DISPNAME}")
+
+
+#-------------------------------------------------------------------------------
+# Set UNIX friendly name for app & fix OpenSUSE builds
+#-------------------------------------------------------------------------------
+if (UNIX AND NOT APPLE)
+    set(PROJECT_EXECUTABLE "cockpit-assistant")
+    set(CMAKE_C_COMPILER_AR "/usr/bin/ar")
+    set(CMAKE_CXX_COMPILER_AR "/usr/bin/ar")
+    set(CMAKE_C_COMPILER_RANLIB "/usr/bin/ranlib")
+    set(CMAKE_CXX_COMPILER_RANLIB "/usr/bin/ranlib")
+endif()
+
+
+#-------------------------------------------------------------------------------
+# Production optimization flags
+#-------------------------------------------------------------------------------
+if(PRODUCTION_OPTIMIZATION)
+    # MinGW-specific settings
+    if(WIN32 AND MINGW)
+        add_compile_options(
+        -O3                            # Optimize for speed
+        -Wall                          # Enable most warning messages
+        -Wextra                        # Enable additional warning messages
+        -fuse-linker-plugin            # Use LTO plugin
+        -ftree-vectorize               # Enable loop vectorization
+        -fno-fast-math                 # Standard-compliant floating point math
+        -fno-unsafe-math-optimizations # Use safe math only
+    )
+    add_link_options(
+        -Wl,--gc-sections              # Remove unused sections during linking
+        -fuse-linker-plugin            # Enable LTO during linking
+    )
+
+    # MSVC-specific settings
+    elseif(WIN32 AND MSVC)
+        add_compile_options(
+            /openmp:experimental           # Add support for OpenMP
+            /permissive-                   # Enable strict ISO compliance
+            /Zc:__cplusplus                # Correct __cplusplus value
+            /Zc:preprocessor               # Enable standards-conforming preprocessor
+            /MP                            # Multi-processor compilation
+            /vmg                           # Use general pointer-to-member representation
+            /O2                            # Optimize for speed
+            /W3                            # Warning level 3 messages
+            /GL                            # Enable whole program optimization
+            /MT                            # Link compiler runtime statically
+            /fp:strict                     # Standard-compliant floating point math
+        )
+        add_link_options(
+            /OPT:REF                       # Remove unreferenced functions/data
+            /OPT:ICF                       # Remove identical COMDATs
+            /LTCG                          # Enable LTO during linkingn
+            /NODEFAULTLIB:msvcrt.lib       # Exclude dynamic runtime
+            /IGNORE:4286                   # Ignore Qt libucrt warning
+        )
+
+    # macOS-specific settings
+    elseif(APPLE)
+        add_compile_options(
+            -O3                            # Optimize for speed
+            -Wall                          # Enable most warning messages
+            -Wextra                        # Enable additional warning messages
+            -fvectorize                    # Enable loop vectorization
+            -fslp-vectorize                # Enable SLP vectorization
+            -fno-fast-math                 # Standard-compliant floating point math
+            -fno-unsafe-math-optimizations # Use safe math only
+        )
+        add_link_options(
+            -Wl,-dead_strip                # Remove unused code and data during linking
+            -flto=full                     # Link-time optimization
+        )
+
+    # Intel LLVM-based C++ Compiler
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+        add_compile_options(
+            -O3                            # Optimize for speed
+            -Wall                          # Enable most warning messages
+            -Wextra                        # Enable additional warning messages
+            -qopenmp-simd                  # Add support for OpenMP
+            -static                        # Static link compiler dependencies
+            -fvectorize                    # Enable loop vectorization
+            -fslp-vectorize                # Enable SLP vectorization
+            -msse2                         # Enable SSE2 targeting
+            -fp-model=precise              # Standard-compliant floating point math
+        )
+        add_link_options(
+            -Wl,--gc-sections              # Remove unused sections during linking
+            -flto=full                     # Link-time optimization
+        )
+
+    # Generic UNIX/Linux settings
+    elseif(UNIX)
+        add_compile_options(
+            -O3                            # Optimize for speed
+            -Wall                          # Enable most warning messages
+            -Wextra                        # Enable additional warning messages
+            -fopenmp                       # Add support for OpenMP
+            -ftree-vectorize               # Enable loop vectorization
+            -fno-fast-math                 # Standard-compliant floating point math
+            -msse2                         # Enable SSE2 targeting
+            -fno-unsafe-math-optimizations # Use safe math only
+        )
+        add_link_options(
+            -Wl,--gc-sections              # Remove unused sections during linking
+            -flto                          # Link-time optimization
+        )
+    endif()
+endif()
+
+
+#-------------------------------------------------------------------------------
+# Sanitizer flags
+#-------------------------------------------------------------------------------
+if(DEBUG_SANITIZER)
+    add_compile_options(
+        -fsanitize=address              # Enable AddressSanitizer
+        -fsanitize=undefined            # Enable UndefinedBehaviorSanitizer
+        -fsanitize=leak                 # Enable LeakSanitizer
+        -g                              # Generate debug symbols
+        -fno-omit-frame-pointer         # Preserve frame pointers
+    )
+
+    add_link_options(
+        -fsanitize=address              # Link AddressSanitizer
+        -fsanitize=undefined            # Link UndefinedBehaviorSanitizer
+        -fsanitize=leak                 # Link LeakSanitizer
+    )
+endif()
+
+
+#-------------------------------------------------------------------------------
+# Add subdirectories
+#-------------------------------------------------------------------------------
+add_subdirectory(app)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# qt_standard_project_setup(REQUIRES 6.5)
+
+# qt_add_executable(appcockpit-assistant
+#     main.cpp
+# )
+
+# qt_add_qml_module(appcockpit-assistant
+#     URI cockpit-assistant
+#     VERSION 1.0
+#     QML_FILES
+#         Main.qml
+# )
+
+# # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# # If you are developing for iOS or macOS you should consider setting an
+# # explicit, fixed bundle identifier manually though.
+# set_target_properties(appcockpit-assistant PROPERTIES
+# #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appcockpit-assistant
+#     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+#     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+#     MACOSX_BUNDLE TRUE
+#     WIN32_EXECUTABLE TRUE
+# )
+
+# target_link_libraries(appcockpit-assistant
+#     PRIVATE Qt6::Quick
+# )
+
+# include(GNUInstallDirs)
+# install(TARGETS appcockpit-assistant
+#     BUNDLE DESTINATION .
+#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+# )

@@ -16,25 +16,106 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later OR Commercial
  */
- 
-// #include <QThread>
-// #include <QSysInfo>
-// #include <QSettings>
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+
+#include <iostream>
+
+#include <QWidget>
+#include <QThread>
+#include <QSysInfo>
+#include <QSettings>
+// #include <QQuickStyle>
+#include <QApplication>
+#include <QStyleFactory>
+
+
+#include "AppInfo.h"
+
+
+#ifdef Q_OS_WIN
+    #include <windows.h>
+    #include <cstring>
+#endif
+
+#ifdef Q_OS_LINUX
+    #include <QDir>
+    #include <QFile>
+    #include <QFileInfo>
+    #include <QStandardPaths>
+#endif
+
+
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    // Set application info
+    QApplication::setApplicationName(APP_EXECUTABLE);
+    QApplication::setOrganizationName(APP_DEVELOPER);
+    QApplication::setApplicationVersion(APP_VERSION);
+    QApplication::setApplicationDisplayName(APP_NAME);
+    QApplication::setOrganizationDomain(APP_SUPPORT_URL);
 
-    QQmlApplicationEngine engine;
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("cockpit-assistant", "Main");
+    // Avoid 200% scaling on 150% scaling...
+    auto policy = Qt::HighDpiScaleFactorRoundingPolicy::PassThrough;
+    QApplication::setHighDpiScaleFactorRoundingPolicy(policy);
 
-    return app.exec();
+    // Initialize application
+    QApplication app(argc, argv);
+
+    // Set thread priority
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
+
+    // Set application style
+    app.setStyle(QStyleFactory::create("Fusion"));
+    // QQuickStyle::setStyle("Fusion");
+
+    // Read arguments
+    QString arguments;
+    if (app.arguments().count() >= 2)
+        arguments = app.arguments().at(1);
+
+    // There are some CLI arguments, read them
+    if (!arguments.isEmpty() && arguments.startsWith("-")){
+        if (arguments == "-v" || arguments == "--version"){
+            // cliShowVersion();
+            qDebug() << APP_NAME << "version" << APP_VERSION;
+            return EXIT_SUCCESS;
+        }
+        else if (arguments == "-r" || arguments == "--reset"){
+            // cliResetSettings();
+            QSettings(APP_SUPPORT_URL, APP_NAME).clear();
+            qDebug() << APP_NAME << "settings cleared!";
+            return EXIT_SUCCESS;
+        }
+    }
+
+
+    QWidget window;
+    window.setWindowTitle("Qt6 根界面");
+    window.resize(400, 300); // 设置窗口大小
+    window.show(); // 显示窗口
+
+
+    // QQmlApplicationEngine engine;
+    // QObject::connect(
+    //     &engine,
+    //     &QQmlApplicationEngine::objectCreationFailed,
+    //     &app,
+    //     []() { QCoreApplication::exit(-1); },
+    //     Qt::QueuedConnection);
+    // engine.loadFromModule("cockpit-assistant", "Main");
+    std::cout << "Qt Version: " << QT_VERSION_STR << std::endl;
+
+    // Enter application event loop
+    const auto status = app.exec();
+
+  // Free dynamically-generated argv on Windows
+#ifdef Q_OS_WIN
+    for (int i = 0; i < argc; ++i)
+        free(argv[i]);
+
+    delete[] argv;
+#endif
+
+    // Exit application
+    return status;
 }

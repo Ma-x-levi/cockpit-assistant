@@ -94,6 +94,7 @@ CMakeLists.txt.user*
 *.opensdf
 *.vcxproj
 *vcxproj.*
+*.vscode*
 
 # MinGW generated files
 *.Debug

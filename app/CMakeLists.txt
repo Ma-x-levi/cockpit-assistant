@@ -43,9 +43,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(
     Qt6 REQUIRED
     COMPONENTS
+    Gui
     Qml
     Core
     Quick
+    Widgets
 )
 
 qt_standard_project_setup()
@@ -81,6 +83,34 @@ qt_add_executable(
 target_link_libraries(
     ${PROJECT_EXECUTABLE} PUBLIC
     Qt6::Core
+    Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    Qt6::Widgets
 )
+
+
+# qt_add_qml_module(
+#     app URI 
+#     cockpit-assistant
+#     VERSION 1.0
+#     QML_FILES
+#         qml/Main.qml
+# )
+
+#-------------------------------------------------------------------------------
+# Packaging
+#-------------------------------------------------------------------------------
+
+set(CPACK_PACKAGE_NAME                  ${PROJECT_DISPNAME})
+set(CPACK_PACKAGE_CONTACT               ${PROJECT_CONTACT})
+set(CPACK_PACKAGE_VENDOR                ${PROJECT_VENDOR})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY   ${PROJECT_DESCRIPTION_SUMMARY})
+set(CPACK_PACKAGE_VERSION_MAJOR         ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR         ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH         ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_DESCRIPTION_FILE      ${PROJECT_DESCRIPTION_FILE})
+set(CPACK_PACKAGE_FILE_NAME             ${PROJECT_FILE_NAME})
+set(CPACK_RESOURCE_FILE_LICENSE         ${PROJECT_FILE_LICENSE})
+
+set(CPACK_MONOLITHIC_INSTALL ON)

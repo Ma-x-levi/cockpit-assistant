@@ -48,6 +48,7 @@ find_package(
     Core
     Quick
     Widgets
+    QuickControls2
 )
 
 qt_standard_project_setup()
@@ -62,11 +63,45 @@ include_directories(src)
 
 set(SOURCES
     src/main.cpp
+    src/Theme/ThemeManager.cpp
+    src/Module/ModuleManager.cpp
 )
 
 set(HEADERS
-
+    src/Platform/NativeWindow.h
+    src/Theme/ThemeManager.h
+    src/Module/ModuleManager.h
 )
+
+
+#-------------------------------------------------------------------------------
+# Platform-specific configuration
+#-------------------------------------------------------------------------------
+if(WIN32)
+    set(WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/deploy/windows/info.rc")
+    set(SOURCES ${SOURCES} ${WIN_RC} "src/Platform/NativeWindow_Windows.cpp")
+elseif(APPLE)
+    set(ICON_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/icon.icns")
+    set(INFO_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/info.plist")
+    set_source_files_properties(
+        ${ICON_MACOSX}
+        PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+    )
+    set(SOURCES ${SOURCES} ${ICON_MACOSX} "src/Platform/NativeWindow_macOS.mm")
+    set_source_files_properties(
+        "src/Platform/NativeWindow_macOS.mm" PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+    )
+elseif(UNIX)
+    set(SOURCES ${SOURCES} "src/Platform/NativeWindow_UNIX.cpp")
+endif()
+
+
+#-------------------------------------------------------------------------------
+# Add resources
+#-------------------------------------------------------------------------------
+qt_add_resources(QML_RCC ${CMAKE_CURRENT_SOURCE_DIR}/qml/qml.qrc)
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -87,6 +122,7 @@ target_link_libraries(
     Qt6::Qml
     Qt6::Quick
     Qt6::Widgets
+    Qt6::QuickControls2
 )
 
 

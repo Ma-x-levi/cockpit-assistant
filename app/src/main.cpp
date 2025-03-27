@@ -23,12 +23,13 @@
 #include <QThread>
 #include <QSysInfo>
 #include <QSettings>
-// #include <QQuickStyle>
+#include <QQuickStyle>
 #include <QApplication>
 #include <QStyleFactory>
 
 
 #include "AppInfo.h"
+#include "Module/ModuleManager.h"
 
 
 #ifdef Q_OS_WIN
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 
     // Set application style
     app.setStyle(QStyleFactory::create("Fusion"));
-    // QQuickStyle::setStyle("Fusion");
+    QQuickStyle::setStyle("Fusion");
 
     // Read arguments
     QString arguments;
@@ -89,10 +90,19 @@ int main(int argc, char *argv[])
     }
 
 
-    QWidget window;
-    window.setWindowTitle("Qt6 根界面");
-    window.resize(400, 300); // 设置窗口大小
-    window.show(); // 显示窗口
+    // QWidget window;
+    // window.setWindowTitle("Qt6 根界面");
+    // window.resize(400, 300); // 设置窗口大小
+    // window.show(); // 显示窗口 
+
+
+    // Create module manager
+    ModuleManager moduleManager;
+    // moduleManager.configureUpdater();
+
+    // // Initialize QML interface
+    // moduleManager.registerQmlTypes();
+    moduleManager.initializeQmlInterface();
 
 
     // QQmlApplicationEngine engine;

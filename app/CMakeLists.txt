@@ -111,6 +111,7 @@ qt_add_executable(
     ${PROJECT_EXECUTABLE}
     ${SOURCES}
     ${HEADERS}
+    ${QML_RCC}
     MANUAL_FINALIZATION
 )
 
@@ -133,6 +134,37 @@ target_link_libraries(
 #     QML_FILES
 #         qml/Main.qml
 # )
+
+
+#-------------------------------------------------------------------------------
+# Qt Deployment
+#-------------------------------------------------------------------------------
+
+qt_finalize_executable(${PROJECT_EXECUTABLE})
+
+install(
+ TARGETS ${PROJECT_EXECUTABLE}
+ BUNDLE  DESTINATION .
+ RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+set(deploy_tool_options_arg "")
+if(APPLE)
+ set(deploy_tool_options_arg -hardened-runtime -appstore-compliant)
+elseif(WIN32)
+ set(deploy_tool_options_arg --no-compiler-runtime -force-openssl --release)
+endif()
+
+qt_generate_deploy_qml_app_script(
+ TARGET ${PROJECT_EXECUTABLE}
+ OUTPUT_SCRIPT deploy_script
+ MACOS_BUNDLE_POST_BUILD
+ NO_UNSUPPORTED_PLATFORM_ERROR
+ DEPLOY_USER_QML_MODULES_ON_UNSUPPORTED_PLATFORM
+ DEPLOY_TOOL_OPTIONS ${deploy_tool_options_arg}
+)
+
+install(SCRIPT ${deploy_script})
 
 #-------------------------------------------------------------------------------
 # Packaging

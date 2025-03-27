@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
+        <file>DialogLoader.qml</file>
+        <file>Widgets/SmartWindow.qml</file>
         <file>main.qml</file>
     </qresource>
 </RCC>

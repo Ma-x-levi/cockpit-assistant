@@ -21,6 +21,23 @@
 
 #include <QObject>
 #include <QVector>
+#include <QQmlApplicationEngine>
+
+
+class CockpitAssistant : public QObject
+{
+    Q_OBJECT
+private:
+
+    QQmlApplicationEngine m_engine;
+    
+public:
+    CockpitAssistant();
+
+    ~CockpitAssistant();
+
+    void initializeQmlInterface();
+};
 
 
 

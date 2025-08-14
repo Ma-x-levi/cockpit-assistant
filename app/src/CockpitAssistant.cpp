@@ -16,3 +16,20 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later OR Commercial
  */
+
+#include "CockpitAssistant.h"
+
+
+CockpitAssistant::CockpitAssistant()
+{
+}
+
+CockpitAssistant::~CockpitAssistant()
+{
+}
+
+
+void CockpitAssistant::initializeQmlInterface()
+{
+    m_engine.load(QUrl(QStringLiteral("qrc:/qml/CockpitAssistant.qml")));
+}

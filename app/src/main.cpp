@@ -29,7 +29,9 @@
 
 
 #include "AppInfo.h"
-#include "Module/ModuleManager.h"
+// #include "Module/ModuleManager.h"
+
+#include "CockpitAssistant.h"
 
 
 #ifdef Q_OS_WIN
@@ -45,9 +47,16 @@
 #endif
 
 
+#include "mainwindow.h"
+
+
+
 
 int main(int argc, char *argv[])
 {
+    //show qt verssion
+    std::cout << "Qt Version: " << QT_VERSION_STR << std::endl;
+
     // Set application info
     QApplication::setApplicationName(APP_EXECUTABLE);
     QApplication::setOrganizationName(APP_DEVELOPER);
@@ -69,63 +78,14 @@ int main(int argc, char *argv[])
     app.setStyle(QStyleFactory::create("Fusion"));
     QQuickStyle::setStyle("Fusion");
 
-    // Read arguments
-    QString arguments;
-    if (app.arguments().count() >= 2)
-        arguments = app.arguments().at(1);
+    // MainWindow w;
+    // w.show();
 
-    // There are some CLI arguments, read them
-    if (!arguments.isEmpty() && arguments.startsWith("-")){
-        if (arguments == "-v" || arguments == "--version"){
-            // cliShowVersion();
-            qDebug() << APP_NAME << "version" << APP_VERSION;
-            return EXIT_SUCCESS;
-        }
-        else if (arguments == "-r" || arguments == "--reset"){
-            // cliResetSettings();
-            QSettings(APP_SUPPORT_URL, APP_NAME).clear();
-            qDebug() << APP_NAME << "settings cleared!";
-            return EXIT_SUCCESS;
-        }
-    }
+    CockpitAssistant cockpitAssistant;
+    cockpitAssistant.initializeQmlInterface();
 
-
-    // QWidget window;
-    // window.setWindowTitle("Qt6 根界面");
-    // window.resize(400, 300); // 设置窗口大小
-    // window.show(); // 显示窗口 
-
-
-    // Create module manager
-    ModuleManager moduleManager;
-    // moduleManager.configureUpdater();
-
-    // // Initialize QML interface
-    // moduleManager.registerQmlTypes();
-    moduleManager.initializeQmlInterface();
-
-
-    // QQmlApplicationEngine engine;
-    // QObject::connect(
-    //     &engine,
-    //     &QQmlApplicationEngine::objectCreationFailed,
-    //     &app,
-    //     []() { QCoreApplication::exit(-1); },
-    //     Qt::QueuedConnection);
-    // engine.loadFromModule("cockpit-assistant", "Main");
-    std::cout << "Qt Version: " << QT_VERSION_STR << std::endl;
+    
 
     // Enter application event loop
-    const auto status = app.exec();
-
-  // Free dynamically-generated argv on Windows
-#ifdef Q_OS_WIN
-    for (int i = 0; i < argc; ++i)
-        free(argv[i]);
-
-    delete[] argv;
-#endif
-
-    // Exit application
-    return status;
+    return app.exec();
 }

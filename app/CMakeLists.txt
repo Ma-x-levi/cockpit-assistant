@@ -48,6 +48,7 @@ find_package(
     Core
     Quick
     Widgets
+    PrintSupport
     QuickControls2
 )
 
@@ -63,37 +64,38 @@ include_directories(src)
 
 set(SOURCES
     src/main.cpp
-    src/Theme/ThemeManager.cpp
-    src/Module/ModuleManager.cpp
+    src/CockpitAssistant.cpp
+    src/Libraries/Qcustomplot/qcustomplot.cpp
+    src/mainwindow.cpp
 )
 
 set(HEADERS
-    src/Platform/NativeWindow.h
-    src/Theme/ThemeManager.h
-    src/Module/ModuleManager.h
+    src/CockpitAssistant.h
+    src/Libraries/Qcustomplot/qcustomplot.h
+    src/mainwindow.h
 )
 
 
 #-------------------------------------------------------------------------------
 # Platform-specific configuration
 #-------------------------------------------------------------------------------
-if(WIN32)
-    set(WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/deploy/windows/info.rc")
-    set(SOURCES ${SOURCES} ${WIN_RC} "src/Platform/NativeWindow_Windows.cpp")
-elseif(APPLE)
-    set(ICON_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/icon.icns")
-    set(INFO_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/info.plist")
-    set_source_files_properties(
-        ${ICON_MACOSX}
-        PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
-    )
-    set(SOURCES ${SOURCES} ${ICON_MACOSX} "src/Platform/NativeWindow_macOS.mm")
-    set_source_files_properties(
-        "src/Platform/NativeWindow_macOS.mm" PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
-    )
-elseif(UNIX)
-    set(SOURCES ${SOURCES} "src/Platform/NativeWindow_UNIX.cpp")
-endif()
+# if(WIN32)
+#     set(WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/deploy/windows/info.rc")
+#     set(SOURCES ${SOURCES} ${WIN_RC} "src/Platform/NativeWindow_Windows.cpp")
+# elseif(APPLE)
+#     set(ICON_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/icon.icns")
+#     set(INFO_MACOSX "${CMAKE_CURRENT_SOURCE_DIR}/deploy/macOS/info.plist")
+#     set_source_files_properties(
+#         ${ICON_MACOSX}
+#         PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+#     )
+#     set(SOURCES ${SOURCES} ${ICON_MACOSX} "src/Platform/NativeWindow_macOS.mm")
+#     set_source_files_properties(
+#         "src/Platform/NativeWindow_macOS.mm" PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+#     )
+# elseif(UNIX)
+#     set(SOURCES ${SOURCES} "src/Platform/NativeWindow_UNIX.cpp")
+# endif()
 
 
 #-------------------------------------------------------------------------------
@@ -123,6 +125,7 @@ target_link_libraries(
     Qt6::Qml
     Qt6::Quick
     Qt6::Widgets
+    Qt6::PrintSupport
     Qt6::QuickControls2
 )
 

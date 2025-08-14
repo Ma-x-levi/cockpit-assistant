@@ -1,7 +1,13 @@
 <RCC>
     <qresource prefix="/qml">
+        <file>Widgets/connected.svg</file>
         <file>DialogLoader.qml</file>
+        <file>Dialogs/Acknowledgements.qml</file>
         <file>Widgets/SmartWindow.qml</file>
-        <file>main.qml</file>
+        <file>Widgets/SmartButton.qml</file>    
+        <file>Widgets/BigButton.qml</file>
+        <file>MainWindow/Root.qml</file>
+        <file>Main.qml</file>
+        <file>CockpitAssistant.qml</file>
     </qresource>
 </RCC>

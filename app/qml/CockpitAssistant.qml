@@ -1,154 +1,151 @@
-import QtQuick
-import QtWebSockets
-import QtQuick.Window
-import QtQuick.Layouts
+// import QtQuick 2.15
+// import QtQuick.Controls 2.15
+// import QtQuick.Window 2.15
+
+// ApplicationWindow {
+//     visible: true
+//     width: 640
+//     height: 480
+
+//     menuBar: MenuBar {
+//         Menu {
+//             title: "File"
+//             MenuItem { text: "Open..." }
+//             MenuItem { text: "Close" }
+//         }
+
+//         Menu {
+//             title: "File2"
+//             MenuItem { text: "Open..." }
+//             MenuItem { text: "Close" }
+//         }
+//     }
+
+//     // 主内容区域
+//     Label {
+//         text: "Hello, World!"
+//         anchors.centerIn: parent
+//     }
+
+//     // statusBar: StatusBar {
+//     //     // 状态栏内容
+//     // }
+
+
+
+//     // SwipeView {
+//     //     id: swipeView
+//     //     anchors.fill: parent
+//     //     interactive: true  // 确保可以手势翻页
+
+//     //     Repeater {
+//     //         model: 3   // 三页图标
+
+//     //         Item {
+//     //             width: swipeView.width
+//     //             height: swipeView.height
+
+//     //             GridView {
+//     //                 anchors.fill: parent
+//     //                 cellWidth: 100
+//     //                 cellHeight: 100
+//     //                 model: 120  // 每页 12 个图标
+//     //                 delegate: Rectangle {
+//     //                     width: 80; height: 80
+//     //                     color: "skyblue"
+//     //                     radius: 10
+//     //                     Text {
+//     //                         anchors.centerIn: parent
+//     //                         text: "图标 " + index
+//     //                     }
+//     //                 }
+//     //             }
+//     //         }
+//     //     }
+
+//     //     // 平滑翻页动画
+//     //     onCurrentIndexChanged: {
+//     //         console.log("翻到第 " + currentIndex + " 页");
+//     //     }
+
+//     //     Behavior on currentIndex {
+//     //         NumberAnimation {
+//     //             duration: 400
+//     //             easing.type: Easing.OutCubic
+//     //         }
+//     //     }
+//     // }
+
+//     // // 底部指示器
+//     // PageIndicator {
+//     //     anchors.bottom: parent.bottom
+//     //     anchors.horizontalCenter: parent.horizontalCenter
+//     //     count: swipeView.count
+//     //     currentIndex: swipeView.currentIndex
+//     // }
+
+
+
+
+
+import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Controls
-
-import "Dialogs" as Dialogs
-import "MainWindow" as MainWindow
-import "Widgets" as Widgets
+import QtQuick.Layouts
 
 
+import "Modules" as Modules
 
-MainWindow.Root {
-    id: mainWindow
-    // onClosing: (close) => app.handleClose(close)
-
-    width: 1920
-    height: 1080
+Window {
+    width: 400
+    height: 600
     visible: true
-    title: qsTr("Hello World")
 
-    // ColumnLayout {
-    //     id: layout
-    //     spacing: 0
-    //     anchors.fill: parent
-
-    //     Text {
-    //         text: "Hello Qt6!"
-    //         // anchors.centerIn: parent
-    //     }
-
-    //     Text {
-    //         text: "Hello Qt6111!"
-    //         // anchors.centerIn: parent
-    //     }
-
-    //     RowLayout {
-    //         id: layoutff
-    //         spacing: 1
-    //         anchors.fill: parent
-
-    //         Widgets.SmartButton {
-    //             name: qsTr("SmartButton1")
-    //         }
-
-    //         Widgets.SmartButton {
-    //             name: qsTr("SmartButton2")
-    //         }
-
-    //         Widgets.SmartButton {
-    //             name: qsTr("SmartButton3")
-    //         }
-    //     }
-    // }
-    // property int appLaunchCount: 0
-    // property string documentTitle: ""
-    // property bool firstValidFrame: false
-    // property bool automaticUpdates: false
-
-    // 定义3个不同的界面
-    Component {
-        id: page1
-        Rectangle {
-            color: "lightblue"
-            Text {
-                anchors.centerIn: parent
-                text: "这是界面1"
-                font.pixelSize: 24
-            }
-        }
-    }
-
-    Component {
-        id: page2
-        Rectangle {
-            color: "lightgreen"
-            Text {
-                anchors.centerIn: parent
-                text: "这是界面2"
-                font.pixelSize: 24
-            }
-        }
-    }
-
-    Component {
-        id: page3
-        Rectangle {
-            color: "lightpink"
-            Text {
-                anchors.centerIn: parent
-                text: "这是界面3"
-                font.pixelSize: 24
-            }
-        }
-    }
-
-    // 主布局
-    RowLayout {
+    Column {
         anchors.fill: parent
-        spacing: 10
-
-        // 内容显示区域
-        Rectangle {
-            id: contentArea
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            border.color: "gray"
-            border.width: 1
-
-            // 使用Loader加载不同界面
-            Loader {
-                id: contentLoader
-                anchors.fill: parent
-                sourceComponent: page1 // 默认显示第一个界面
+        
+        // 添加和删除按钮
+        Row {
+            spacing: 10
+            padding: 10
+            
+            Button {
+                text: "添加项目"
+                onClicked: testSwipe2.addItem("Button 1", "qrc:/qml/Images/Samples/icon_button1.png")
+            }
+            
+            Button {
+                text: "清空列表"
+                onClicked: testSwipe2.removeItem(0)
             }
         }
+    }
 
-        // 按钮区域
-        ColumnLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 10
+    ColumnLayout {
+        anchors.fill: parent
 
-            // Button {
-            //     text: "界面1"
-            //     onClicked: contentLoader.sourceComponent = page1
-            // }
 
-            // Button {
-            //     text: "界面2"
-            //     onClicked: contentLoader.sourceComponent = page2
-            // }
+        Modules.SmartFlow {
+            id: smartFlow
+            // anchors.fill: parent
+            // anchors.left: parent.left    // 左边缘对齐父元素左边缘
+            // anchors.right: parent.right  // 右边缘对齐父元素右边缘
+            Layout.fillWidth: true
 
-            // Button {
-            //     text: "界面3"
-            //     onClicked: contentLoader.sourceComponent = page3
-            // }
+            iconHeight: 40
+            iconWidth:  40
+        }
 
-            Widgets.SmartButton {
-                name: qsTr("界面1")
-                customOnClicked: function() {contentLoader.sourceComponent = page1}
-            }
+        Modules.ButtonSwipe {
+            id: testSwipe2
+            // anchors.left: parent.left    // 左边缘对齐父元素左边缘
+            // anchors.right: parent.right  // 右边缘对齐父元素右边缘
+            Layout.fillWidth: true
 
-            Widgets.SmartButton {
-                name: qsTr("界面2")
-                customOnClicked: function() {contentLoader.sourceComponent = page2}
-            }
+            buttonIconHeight: 40
+            buttonIconWidth:  40
 
-            Widgets.SmartButton {
-                name: qsTr("界面3")
-                customOnClicked: function() {contentLoader.sourceComponent = page3}
-            }
+            actionCallback: function(option) { console.log("ButtonSwipe Action: " + option) }
         }
     }
 }

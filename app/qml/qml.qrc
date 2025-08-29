@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
+        <file>Modules/ButtonSwipe.qml</file>
+        <file>Modules/SmartFlow.qml</file>
         <file>Widgets/connected.svg</file>
         <file>DialogLoader.qml</file>
         <file>Dialogs/Acknowledgements.qml</file>
@@ -9,5 +11,14 @@
         <file>MainWindow/Root.qml</file>
         <file>Main.qml</file>
         <file>CockpitAssistant.qml</file>
+        <file>Images/Samples/icon_button1.png</file>
+        <file>Images/Samples/icon_button2.png</file>
+        <file>Images/Samples/icon_list_item1.png</file>
+        <file>Images/Samples/icon_list_item2.png</file>
+        <file>Images/Samples/icon_scale.png</file>
+        <file>Images/Samples/icon_switch_select.png</file>
+        <file>Images/Samples/icon_switch_unselect.png</file>
+        <file>Images/Samples/icon_test1.svg</file>
+        <file>Images/Samples/icon_test2.svg</file>
     </qresource>
 </RCC>

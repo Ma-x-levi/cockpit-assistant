@@ -20,5 +20,6 @@
         <file>Images/Samples/icon_switch_unselect.png</file>
         <file>Images/Samples/icon_test1.svg</file>
         <file>Images/Samples/icon_test2.svg</file>
+        <file>Images/Samples/icon_test3.svg</file>
     </qresource>
 </RCC>

@@ -101,28 +101,31 @@ Window {
     height: 600
     visible: true
 
-    Column {
-        anchors.fill: parent
-        
-        // 添加和删除按钮
-        Row {
-            spacing: 10
-            padding: 10
-            
-            Button {
-                text: "添加项目"
-                onClicked: testSwipe2.addItem("Button 1", "qrc:/qml/Images/Samples/icon_button1.png")
-            }
-            
-            Button {
-                text: "清空列表"
-                onClicked: testSwipe2.removeItem(0)
-            }
-        }
-    }
+    
 
     ColumnLayout {
         anchors.fill: parent
+
+        Column {
+            Layout.fillWidth: true
+            height:   200
+            
+            // 添加和删除按钮
+            Row {
+                spacing: 10
+                padding: 10
+                
+                Button {
+                    text: "添加项目"
+                    onClicked: testSwipe2.addItem("Button 1", "qrc:/qml/Images/Samples/icon_button1.png")
+                }
+                
+                Button {
+                    text: "清空列表"
+                    onClicked: testSwipe2.removeItem(0)
+                }
+            }
+        }
 
 
         Modules.SmartFlow {
@@ -131,6 +134,7 @@ Window {
             // anchors.left: parent.left    // 左边缘对齐父元素左边缘
             // anchors.right: parent.right  // 右边缘对齐父元素右边缘
             Layout.fillWidth: true
+            height:   120
 
             iconHeight: 40
             iconWidth:  40
@@ -141,11 +145,50 @@ Window {
             // anchors.left: parent.left    // 左边缘对齐父元素左边缘
             // anchors.right: parent.right  // 右边缘对齐父元素右边缘
             Layout.fillWidth: true
+            height:   120
+            // Layout.fillHeight: true
 
-            buttonIconHeight: 40
-            buttonIconWidth:  40
 
-            actionCallback: function(option) { console.log("ButtonSwipe Action: " + option) }
+            ListModel {
+                id: buttonList
+                ListElement { name: "Button 1"; icon: "qrc:/qml/Images/Samples/icon_test1.svg"}
+                ListElement { name: "Button 2"; icon: "qrc:/qml/Images/Samples/icon_test2.svg"}
+                ListElement { name: "Button 3"; icon: "qrc:/qml/Images/Samples/icon_test3.svg"}
+            }
+
+            ListModel {
+                id: buttonList1
+                ListElement { name: "Button 1"; icon: "qrc:/qml/Images/Samples/icon_test3.svg"}
+                ListElement { name: "Button 2"; icon: "qrc:/qml/Images/Samples/icon_test2.svg"}
+                ListElement { name: "Button 3"; icon: "qrc:/qml/Images/Samples/icon_test1.svg"}
+            }
+
+            buttonGroup: [buttonList, buttonList1]
+
+
+            cellHeight:   50
+            cellWidth:    50
+            buttonHeight: 40
+            buttonWidth:  40
+
+            actionCallback: function(option) { console.log("ButtonSwipe1 Action: " + option) }
+        }
+
+        Modules.ButtonSwipe {
+            id: testSwipe3
+            // anchors.left: parent.left    // 左边缘对齐父元素左边缘
+            // anchors.right: parent.right  // 右边缘对齐父元素右边缘
+            Layout.fillWidth: true
+            height:   120
+            // Layout.fillHeight: true
+
+
+            cellHeight:   50
+            cellWidth:    50
+            buttonHeight: 40
+            buttonWidth:  40
+
+            actionCallback: function(option) { console.log("ButtonSwipe2 Action: " + option) }
         }
     }
 }
